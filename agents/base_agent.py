@@ -64,7 +64,8 @@ class BaseAgent(ABC):
                  agent_role: Optional[str] = None,
                  rag_enabled: bool = False,
                  vector_store: Optional[str] = None,
-                 interactions: str):
+                 interactions: str,
+                 show_logger: bool = True):
         
         """
         Initialize the agent with required attributes.
@@ -104,10 +105,12 @@ class BaseAgent(ABC):
         self.rag_enabled: bool = rag_enabled
         self.vector_store: Optional[str] = vector_store
         self.interactions = interactions
+        self.show_logger = show_logger
 
         # Log the agent's initialization details
-        self.log_agent_details()
-        print()
+        if self.show_logger:
+            self.log_agent_details()
+            print()
 
     @abstractmethod
     def update_persona(self, persona: str) -> None:
@@ -213,7 +216,8 @@ if __name__ == "__main__":
         rag_enabled=True,
         vector_store="FAISS",
         agent_memory="MySQLMemory()",
-        interactions="ResearchBot, SecureBot"
+        interactions="ResearchBot, SecureBot",
+        show_logger = False
     )
 
     agent2 = ResearchAgent(
@@ -226,7 +230,8 @@ if __name__ == "__main__":
         rag_enabled=True,
         vector_store="Pinecone",
         agent_memory="PostgresMemory()",
-        interactions="HelperBot, SecureBot"
+        interactions="HelperBot, SecureBot",
+        show_logger = False
     )
 
     agent3 = SecurityAgent(
