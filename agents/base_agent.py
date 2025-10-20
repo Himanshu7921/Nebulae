@@ -13,13 +13,14 @@ class Color:
     BOLD: str = '\033[1m'
     END: str = '\033[0m'
 
-# Logger setup
+# Logger setup (safe: don't add duplicate handlers on repeated imports)
 logger = logging.getLogger("AgentLogger")
-logger.setLevel(logging.INFO)
-console_handler = logging.StreamHandler()
-formatter = logging.Formatter("%(message)s")  # Simple output format
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(message)s")  # Simple output format
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
 
 
 class BaseAgent(ABC):
@@ -51,7 +52,7 @@ class BaseAgent(ABC):
     def __init__(self, *,
                  agent_name: str,
                  agent_description: str,
-                 agent_tools: List[Any],
+                 agent_tools: Optional[List[Any]] = None,
                  llm: str,
                  agent_id: int,
                  agent_config_dict: Optional[Dict] = None,
@@ -64,16 +65,16 @@ class BaseAgent(ABC):
                  agent_role: Optional[str] = None,
                  rag_enabled: bool = False,
                  vector_store: Optional[str] = None,
-                 interactions: str,
+                 interactions: Optional[str] = None,
                  show_logger: bool = True):
-        
+
         """
         Initialize the agent with required attributes.
 
         Args:
             agent_name (str): Name of the agent.
             agent_description (str): Brief description of the agent.
-            agent_tools (List[Any]): Tools available to the agent.
+            agent_tools (Optional[List[Any]]): Tools available to the agent. Defaults to [].
             llm (str): Language model used by the agent.
             agent_id (int): Unique identifier for the agent.
             agent_config_dict (Optional[Dict]): Optional configuration dictionary.
@@ -86,26 +87,31 @@ class BaseAgent(ABC):
             agent_role (Optional[str]): Role of the agent. Defaults to None.
             rag_enabled (bool): Whether Retrieval-Augmented Generation is enabled. Defaults to False.
             vector_store (Optional[str]): Name of the vector store if RAG is enabled.
-            interactions (str): Defines other agents this agent communicates or collaborates with.
+            interactions (Optional[str]): Defines other agents this agent communicates or collaborates with.
         """
 
         self.llm: str = llm
         self.agent_name: str = agent_name
         self.agent_description: str = agent_description
-        self.agent_tools: List[Any] = agent_tools
+        # avoid mutable default at signature: normalize here
+        self.agent_tools: List[Any] = list(agent_tools) if agent_tools else []
         self.agent_id: int = agent_id
         self.agent_config_dict: Optional[Dict] = agent_config_dict
         self.agent_memory: Optional[Any] = agent_memory
         self.agent_persona: Optional[str] = agent_persona
         self.agent_prompt: Optional[str] = agent_prompt
         self.verbose: bool = verbose
-        self.logger: Optional[logging.Logger] = logger
+        # prefer a provided logger, otherwise use module-level logger
+        self.logger: logging.Logger = logger if logger is not None else logger  # will be replaced below
+        # Note: avoid shadowing name 'logger' variable; use module logger as fallback
+        if logger is None:
+            self.logger = globals().get("logger")
         self.update_strategy: Optional[Callable] = update_strategy
         self.agent_role: Optional[str] = agent_role
         self.rag_enabled: bool = rag_enabled
         self.vector_store: Optional[str] = vector_store
-        self.interactions = interactions
-        self.show_logger = show_logger
+        self.interactions: Optional[str] = interactions
+        self.show_logger: bool = show_logger
 
         # Log the agent's initialization details
         if self.show_logger:
@@ -143,67 +149,84 @@ class BaseAgent(ABC):
         Includes agent name, role, ID, LLM, RAG usage, memory, tools, and interactions.
         Provides a visually formatted output using ANSI color codes.
         """
+        log = self.logger if self.logger is not None else globals().get("logger")
+
         # Header
-        logger.info(Color.CYAN + "------------------------ 🤖 Agent Details ------------------------" + Color.END)
+        log.info(Color.CYAN + "------------------------ 🤖 Agent Details ------------------------" + Color.END)
 
         # Name and role
-        logger.info(
+        log.info(
             f"{Color.BOLD}{self.agent_name}{Color.END} is initialized as {Color.YELLOW}{self.agent_role}{Color.END} role | "
             f"Agent_id = {Color.GREEN}{self.agent_id}{Color.END}"
         )
 
         # LLM information
         if self.llm:
-            logger.info(f"Agent LLM: {Color.BLUE}{self.llm}{Color.END}")
+            log.info(f"Agent LLM: {Color.BLUE}{self.llm}{Color.END}")
 
         # RAG information
         if self.rag_enabled:
             rag_line = f"This agent will use {Color.BLUE}RAG Technology{Color.END}"
             if self.vector_store:
                 rag_line += f" | Vector Store: {Color.GREEN}{self.vector_store}{Color.END}"
-            logger.info(rag_line)
+            log.info(rag_line)
 
         # Memory information
         if self.agent_memory:
-            logger.info(f"This agent will also use Memory associated to {Color.YELLOW}{self.agent_memory}{Color.END}")
+            log.info(f"This agent will also use Memory associated to {Color.YELLOW}{self.agent_memory}{Color.END}")
 
         # Tools information
         if self.agent_tools:
             tools_list = ", ".join(str(tool) for tool in self.agent_tools)
-            logger.info(f"Tools available for this agent: {Color.GREEN}{tools_list}{Color.END}")
+            log.info(f"Tools available for this agent: {Color.GREEN}{tools_list}{Color.END}")
 
         # Interactions information
         if self.interactions:
-            logger.info(f"Interacts with other agents: {Color.CYAN}{self.interactions}{Color.END}")
+            log.info(f"Interacts with other agents: {Color.CYAN}{self.interactions}{Color.END}")
 
         # Footer
-        logger.info(Color.CYAN + "------------------------------------------------------------------" + Color.END)
+        log.info(Color.CYAN + "------------------------------------------------------------------" + Color.END)
 
 if __name__ == "__main__":
     # Concrete implementations of BaseAgent (subclasses)
     class MyAgent(BaseAgent):
         """Example agent subclass implementing BaseAgent."""
-        def update_persona(self): pass
-        def run_agent(self): pass
-        def update_memory(self): pass
-        def build_agent(self): pass
-        def get_agent_chain(self): pass
+        def update_persona(self, persona: str) -> None: 
+            pass
+        def run_agent(self) -> None: 
+            pass
+        def update_memory(self) -> None: 
+            pass
+        def build_agent(self) -> None: 
+            pass
+        def get_agent_chain(self) -> Any: 
+            pass
 
     class ResearchAgent(BaseAgent):
         """Research-focused agent subclass implementing BaseAgent."""
-        def update_persona(self): pass
-        def run_agent(self): pass
-        def update_memory(self): pass
-        def build_agent(self): pass
-        def get_agent_chain(self): pass
+        def update_persona(self, persona: str) -> None:
+            pass
+        def run_agent(self) -> None:
+            pass
+        def update_memory(self) -> None:
+            pass
+        def build_agent(self) -> None:
+            pass
+        def get_agent_chain(self) -> Any:
+            pass
 
     class SecurityAgent(BaseAgent):
         """Security monitoring agent subclass implementing BaseAgent."""
-        def update_persona(self): pass
-        def run_agent(self): pass
-        def update_memory(self): pass
-        def build_agent(self): pass
-        def get_agent_chain(self): pass
+        def update_persona(self, persona: str) -> None:
+            pass
+        def run_agent(self) -> None:
+            pass
+        def update_memory(self) -> None:
+            pass
+        def build_agent(self) -> None:
+            pass
+        def get_agent_chain(self) -> Any:
+            pass
 
     # Initialize agents with interactions
     agent1 = MyAgent(
