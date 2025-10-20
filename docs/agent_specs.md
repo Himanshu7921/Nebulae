@@ -39,6 +39,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Task Scheduling, Dependency Graph Analysis |
 | **Interactions** | Research Agent, Summarizer Agent, Data Analysis Agent |
 | **Status** | Planned |
+| **Capabilities** | plan_decomposition, task_assignment, dependency_resolution |
+| **Input Schema** | {"type": "object", "properties": {"goal": {"type": "string"}, "constraints": {"type": "object"}}, "required": ["goal"]} |
+| **Output Schema** | {"type": "object", "properties": {"tasks": {"type": "array"}, "dependencies": {"type": "array"}}, "required": ["tasks"]} |
 
 ---
 
@@ -51,6 +54,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Retrieval-Augmented Generation, Query Expansion |
 | **Interactions** | Summarizer Agent, Data Analysis Agent |
 | **Status** | Planned |
+| **Capabilities** | retrieve_documents, cite_sources, metadata_extraction |
+| **Input Schema** | {"type": "object", "properties": {"query": {"type": "string"}, "filters": {"type": "object"}}, "required": ["query"]} |
+| **Output Schema** | {"type": "object", "properties": {"documents": {"type": "array"}, "metadata": {"type": "object"}}, "required": ["documents"]} |
 
 ---
 
@@ -63,6 +69,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Prompt Chaining, Context Reduction |
 | **Interactions** | Writer Agent, Critic Agent |
 | **Status** | Planned |
+| **Capabilities** | summarize_text, extract_keypoints, shorten_content |
+| **Input Schema** | {"type": "object", "properties": {"documents": {"type": "array"}, "summary_length": {"type": "string"}}, "required": ["documents"]} |
+| **Output Schema** | {"type": "object", "properties": {"summary": {"type": "string"}, "highlights": {"type": "array"}}, "required": ["summary"]} |
 
 ---
 
@@ -75,6 +84,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Pandas, NumPy, Matplotlib |
 | **Interactions** | Writer Agent, Critic Agent |
 | **Status** | Planned |
+| **Capabilities** | analyze_data, generate_plots, compute_statistics |
+| **Input Schema** | {"type": "object", "properties": {"data": {"type": "array"}, "analysis_type": {"type": "string"}}, "required": ["data"]} |
+| **Output Schema** | {"type": "object", "properties": {"insights": {"type": "array"}, "plots": {"type": "array"}}, "required": ["insights"]} |
 
 ---
 
@@ -87,6 +99,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Structured Generation, Reflection |
 | **Interactions** | Critic Agent, Reviewer Agent |
 | **Status** | Planned |
+| **Capabilities** | generate_report, format_markdown, export_pdf |
+| **Input Schema** | {"type": "object", "properties": {"sections": {"type": "array"}, "style": {"type": "string"}}, "required": ["sections"]} |
+| **Output Schema** | {"type": "object", "properties": {"report_markdown": {"type": "string"}, "report_pdf": {"type": ["string", "null"]}}, "required": ["report_markdown"]} |
 
 ---
 
@@ -99,6 +114,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Self-Reflection, Validation Heuristics |
 | **Interactions** | Writer Agent, Memory Agent |
 | **Status** | Planned |
+| **Capabilities** | review_content, fact_check, propose_revisions |
+| **Input Schema** | {"type": "object", "properties": {"content": {"type": "string"}, "context": {"type": "object"}}, "required": ["content"]} |
+| **Output Schema** | {"type": "object", "properties": {"revisions": {"type": "array"}, "score": {"type": "number"}}, "required": ["revisions"]} |
 
 ---
 
@@ -111,6 +129,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Vector Storage, JSON/SQLite Persistence |
 | **Interactions** | All agents |
 | **Status** | Planned |
+| **Capabilities** | store_memory, retrieve_memory, summarize_history |
+| **Input Schema** | {"type": "object", "properties": {"event": {"type": "object"}, "metadata": {"type": "object"}}, "required": ["event"]} |
+| **Output Schema** | {"type": "object", "properties": {"embedding_id": {"type": "string"}, "record": {"type": "object"}}, "required": ["embedding_id"]} |
 
 ---
 
@@ -123,6 +144,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Feedback Loop Optimization |
 | **Interactions** | Memory Agent, Critic Agent |
 | **Status** | Planned |
+| **Capabilities** | ingest_feedback, prioritize_changes, propose_updates |
+| **Input Schema** | {"type": "object", "properties": {"feedback": {"type": "array"}, "source": {"type": "string"}}, "required": ["feedback"]} |
+| **Output Schema** | {"type": "object", "properties": {"actions": {"type": "array"}}, "required": ["actions"]} |
 
 ---
 
@@ -135,6 +159,9 @@ Each agent follows a standardized structure for interoperability and orchestrati
 | **Techniques Used** | Scheduling, Web Retrieval, Caching |
 | **Interactions** | Research Agent, Memory Agent |
 | **Status** | Planned |
+| **Capabilities** | scheduled_retrieve, refresh_index, cache_invalidate |
+| **Input Schema** | {"type": "object", "properties": {"schedule": {"type": "string"}, "targets": {"type": "array"}}, "required": ["targets"]} |
+| **Output Schema** | {"type": "object", "properties": {"updated_items": {"type": "array"}}, "required": ["updated_items"]} |
 
 ---
 

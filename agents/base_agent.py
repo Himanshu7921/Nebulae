@@ -112,6 +112,7 @@ class BaseAgent(ABC):
         self.vector_store: Optional[str] = vector_store
         self.interactions: Optional[str] = interactions
         self.show_logger: bool = show_logger
+        self.capabilities: List[str] = agent_config_dict.get("capabilities", []) if agent_config_dict else []
 
         # Log the agent's initialization details
         if self.show_logger:
@@ -268,4 +269,14 @@ if __name__ == "__main__":
         vector_store=None,
         agent_memory=None,
         interactions="HelperBot, ResearchBot"
-    )
+    ) 
+
+    def can_handle(self, task: Dict) -> bool:
+        """
+        Simple capability check: task should include 'task_type' and match one of agent's capabilities.
+        Agents should override this for richer validation (schema checks).
+        """
+        task_type = task.get("task_type")
+        if not task_type:
+            return False
+        return task_type in getattr(self, "capabilities", [])
