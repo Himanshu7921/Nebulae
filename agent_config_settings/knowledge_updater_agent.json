@@ -1,0 +1,11 @@
+{
+  "capabilities": ["scheduled_retrieve", "refresh_index", "cache_invalidate"],
+  "input_schema": {
+    "type": "object",
+    "required": ["targets"],
+    "properties": { "schedule": { "type": "string" }, "targets": { "type": "array" } }
+  },
+  "output_schema": { "type": "object", "required": ["updated_items"], "properties": { "updated_items": { "type": "array" } } },
+  "prompt_template": "Refresh and update knowledge indices based on schedule.",
+  "version": "0.1.0"
+}

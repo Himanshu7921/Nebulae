@@ -1,0 +1,19 @@
+{
+  "capabilities": ["generate_report", "format_markdown", "export_pdf"],
+  "input_schema": {
+    "type": "object",
+    "required": ["sections"],
+    "properties": {
+      "sections": { "type": "array" },
+      "style": { "type": "string" }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["report_markdown"],
+    "properties": { "report_markdown": { "type": "string" }, "report_pdf": { "type": ["string", "null"] } }
+  },
+  "prompt_template": "Compose a structured research report with the provided sections.",
+  "tools": ["markdown_renderer", "pdf_generator"],
+  "version": "0.1.0"
+}

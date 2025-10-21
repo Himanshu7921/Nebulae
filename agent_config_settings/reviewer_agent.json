@@ -1,0 +1,11 @@
+{
+  "capabilities": ["ingest_feedback", "prioritize_changes", "propose_updates"],
+  "input_schema": {
+    "type": "object",
+    "required": ["feedback"],
+    "properties": { "feedback": { "type": "array" }, "source": { "type": "string" } }
+  },
+  "output_schema": { "type": "object", "required": ["actions"], "properties": { "actions": { "type": "array" } } },
+  "prompt_template": "Ingest feedback and propose prioritized updates.",
+  "version": "0.1.0"
+}

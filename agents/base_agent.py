@@ -93,28 +93,38 @@ class BaseAgent(ABC):
         self.llm: str = llm
         self.agent_name: str = agent_name
         self.agent_description: str = agent_description
-        # avoid mutable default at signature: normalize here
-        self.agent_tools: List[Any] = list(agent_tools) if agent_tools else []
+        # Init and normalize config dictionary
         self.agent_id: int = agent_id
-        self.agent_config_dict: Optional[Dict] = agent_config_dict
+        self.agent_config_dict: Dict = dict(agent_config_dict or {})
+
+        # prefer explicit constructor args; fall back to config values
+        self.agent_tools: List[Any] = list(agent_tools) if agent_tools is not None else list(self.agent_config_dict.get("tools", []))
         self.agent_memory: Optional[Any] = agent_memory
         self.agent_persona: Optional[str] = agent_persona
         self.agent_prompt: Optional[str] = agent_prompt
         self.verbose: bool = verbose
-        # prefer a provided logger, otherwise use module-level logger
-        self.logger: logging.Logger = logger if logger is not None else logger  # will be replaced below
-        # Note: avoid shadowing name 'logger' variable; use module logger as fallback
-        if logger is None:
-            self.logger = globals().get("logger")
         self.update_strategy: Optional[Callable] = update_strategy
-        self.agent_role: Optional[str] = agent_role
-        self.rag_enabled: bool = rag_enabled
-        self.vector_store: Optional[str] = vector_store
-        self.interactions: Optional[str] = interactions
+
+        # Role and interactions: explicit arg wins, otherwise read from config
+        self.agent_role: Optional[str] = agent_role if agent_role is not None else self.agent_config_dict.get("role") or self.agent_config_dict.get("agent_role")
+        self.interactions: Optional[str] = interactions if interactions is not None else self.agent_config_dict.get("interactions")
+
+        # RAG and vector store: explicit arg preferred; otherwise read from config.rag or keys
+        if rag_enabled is not None and rag_enabled:
+            self.rag_enabled: bool = True
+        else:
+            self.rag_enabled: bool = bool(self.agent_config_dict.get("rag", {}).get("enabled", self.agent_config_dict.get("rag_enabled", False)))
+        self.vector_store: Optional[str] = vector_store if vector_store is not None else self.agent_config_dict.get("vector_store") or self.agent_config_dict.get("rag", {}).get("vector_store")
+
+        # agent visibility/behavior
         self.show_logger: bool = show_logger
-        self.capabilities: List[str] = agent_config_dict.get("capabilities", []) if agent_config_dict else []
+
+        # Capabilities and schemas come from config (empty list/dict if absent)
+        self.capabilities: List[str] = list(self.agent_config_dict.get("capabilities", []))
         self.input_schema = self.agent_config_dict.get("input_schema")
         self.output_schema = self.agent_config_dict.get("output_schema")
+
+        # Final logger resolution (explicit logger -> module-level logger)
         self.logger: logging.Logger = logger if logger is not None else globals().get("logger")
 
         # Log the agent's initialization details

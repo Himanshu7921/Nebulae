@@ -1,0 +1,19 @@
+{
+  "capabilities": ["store_memory", "retrieve_memory", "summarize_history"],
+  "input_schema": {
+    "type": "object",
+    "required": ["event"],
+    "properties": {
+      "event": { "type": "object" },
+      "metadata": { "type": "object" }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["embedding_id"],
+    "properties": { "embedding_id": { "type": "string" }, "record": { "type": "object" } }
+  },
+  "prompt_template": "Persist memory event and produce an embedding id.",
+  "tools": ["vector_store"],
+  "version": "0.1.0"
+}

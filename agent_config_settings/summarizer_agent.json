@@ -1,0 +1,45 @@
+{
+  "capabilities": [
+    "summarize_text"
+  ],
+  "input_schema": {
+    "type": "object",
+    "required": [
+      "documents"
+    ],
+    "properties": {
+      "documents": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "id",
+            "text"
+          ],
+          "properties": {
+            "id": { "type": "string" },
+            "text": { "type": "string" },
+            "title": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "minItems": 1
+      },
+      "summary_length": { "type": "string", "enum": ["short", "medium", "long"] }
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["summary"],
+    "properties": {
+      "summary": { "type": "string" },
+      "highlights": { "type": "array", "items": { "type": "string" } },
+      "sources": { "type": "array", "items": { "type": "object" } }
+    }
+  },
+  "prompt_template": "Summarize the provided documents focusing on key findings and citations.",
+  "tools": ["nlp-summarizer"],
+  "defaults": { "summary_length": "short" },
+  "version": "0.1.0"
+}
