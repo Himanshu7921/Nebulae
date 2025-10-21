@@ -1,0 +1,199 @@
+{
+    "capabilities": [
+        "retrieve_documents"
+    ],
+    "input_schema": {
+        "type": "object",
+        "oneOf": [
+            {
+                "title": "Query-based retrieval",
+                "required": [
+                    "mode",
+                    "query"
+                ],
+                "properties": {
+                    "mode": {
+                        "const": "query"
+                    },
+                    "query": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "filters": {
+                        "type": "object",
+                        "properties": {
+                            "year_range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "source_types": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "language": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "max_results": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "default": 10
+                    },
+                    "retrieve_snippets": {
+                        "type": "boolean",
+                        "default": true
+                    },
+                    "citation_style": {
+                        "type": "string",
+                        "enum": [
+                            "apa",
+                            "mla",
+                            "ieee",
+                            "none"
+                        ],
+                        "default": "none"
+                    }
+                },
+                "additionalProperties": false
+            },
+            {
+                "title": "Direct-documents mode",
+                "required": [
+                    "mode",
+                    "documents"
+                ],
+                "properties": {
+                    "mode": {
+                        "const": "documents"
+                    },
+                    "documents": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "id",
+                                "text"
+                            ],
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "title": {
+                                    "type": "string"
+                                },
+                                "text": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                },
+                                "source": {
+                                    "type": "string"
+                                },
+                                "published_year": {
+                                    "type": "integer"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "minItems": 1
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "context": {
+                                "type": "string"
+                            },
+                            "preferred_sections": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "additionalProperties": false
+            }
+        ],
+        "properties": {
+            "task_id": {
+                "type": "string"
+            },
+            "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 50
+            },
+            "timeout_seconds": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 120
+            },
+            "preferred_agents": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "correlation_id": {
+                "type": "string"
+            }
+        },
+        "additionalProperties": false
+    },
+    "output_schema": {
+        "type": "object",
+        "required": [
+            "documents"
+        ],
+        "properties": {
+            "documents": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": [
+                        "id",
+                        "title",
+                        "text"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "title": {
+                            "type": "string"
+                        },
+                        "text": {
+                            "type": "string"
+                        },
+                        "source": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "metadata": {
+                "type": "object"
+            }
+        }
+    },
+    "prompt_template": "Search and return relevant documents for the query.",
+    "tools": [
+        "paper_search"
+    ],
+    "defaults": {
+        "max_results": 10
+    },
+    "version": "0.1.0"
+}
