@@ -44,8 +44,6 @@
 # IO: input = {schedule, targets}, output = {updated_items}
 
 
-from sympy import false
-
 agent_config_template = {
     # REQUIRED: list of capability identifiers the agent exposes. Use stable, descriptive
     # strings (verb_noun) such as "retrieve_documents", "summarize_text".
