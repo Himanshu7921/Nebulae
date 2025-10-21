@@ -201,9 +201,13 @@ class BaseAgent(ABC):
         task_type = task.get("task_type")
         return bool(task_type and task_type in self.capabilities)
     
-    def execute_task(task):
-        """Executes the given task..."""
-        pass
+    @abstractmethod
+    def execute_task(self, task: Dict) -> Dict:
+        """
+        Execute the provided task and return a result dict.
+        Concrete agents must implement this entrypoint used by the Planner.
+        """
+        raise NotImplementedError
 
     def validate_input(self, payload: Dict) -> bool:
         """
@@ -237,6 +241,8 @@ if __name__ == "__main__":
             pass
         def get_agent_chain(self) -> Any: 
             pass
+        def execute_task(self):
+            pass
 
     class ResearchAgent(BaseAgent):
         """Research-focused agent subclass implementing BaseAgent."""
@@ -250,6 +256,8 @@ if __name__ == "__main__":
             pass
         def get_agent_chain(self) -> Any:
             pass
+        def execute_task(self):
+            pass
 
     class SecurityAgent(BaseAgent):
         """Security monitoring agent subclass implementing BaseAgent."""
@@ -262,6 +270,8 @@ if __name__ == "__main__":
         def build_agent(self) -> None:
             pass
         def get_agent_chain(self) -> Any:
+            pass
+        def execute_task(self):
             pass
 
     # Initialize agents with interactions
