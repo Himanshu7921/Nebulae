@@ -1,0 +1,19 @@
+{
+  "capabilities": ["analyze_data", "generate_plots", "compute_statistics"],
+  "input_schema": {
+    "type": "object",
+    "required": ["data"],
+    "properties": {
+      "data": { "type": "array" },
+      "analysis_type": { "type": "string" }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["insights"],
+    "properties": { "insights": { "type": "array" }, "plots": { "type": "array" } }
+  },
+  "prompt_template": "Run data analysis and produce insights/plots.",
+  "tools": ["pandas", "matplotlib"],
+  "version": "0.1.0"
+}
