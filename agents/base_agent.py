@@ -113,6 +113,9 @@ class BaseAgent(ABC):
         self.interactions: Optional[str] = interactions
         self.show_logger: bool = show_logger
         self.capabilities: List[str] = agent_config_dict.get("capabilities", []) if agent_config_dict else []
+        self.input_schema = self.agent_config_dict.get("input_schema")
+        self.output_schema = self.agent_config_dict.get("output_schema")
+        self.logger: logging.Logger = logger if logger is not None else globals().get("logger")
 
         # Log the agent's initialization details
         if self.show_logger:
@@ -187,6 +190,38 @@ class BaseAgent(ABC):
 
         # Footer
         log.info(Color.CYAN + "------------------------------------------------------------------" + Color.END)
+    
+    def can_handle(self, task: Dict) -> bool:
+        """
+        Cheap capability check: returns True if task.task_type is in self.capabilities.
+        This is intentionally lightweight; use validate_input() for stricter checks.
+        """
+        if not isinstance(task, dict):
+            return False
+        task_type = task.get("task_type")
+        return bool(task_type and task_type in self.capabilities)
+    
+    def execute_task(task):
+        """Executes the given task..."""
+        pass
+
+    def validate_input(self, payload: Dict) -> bool:
+        """
+        Validate payload against input_schema using jsonschema.
+        - Returns True if no schema is defined or if validation passes.
+        - Returns False and logs a warning if validation fails.
+        """
+        if not self.input_schema:
+            return True
+        try:
+            import jsonschema  # optional dependency
+            jsonschema.validate(instance=payload, schema=self.input_schema)
+            return True
+        except Exception as e:
+            log = self.logger or globals().get("logger")
+            if log:
+                log.warning(f"[{self.agent_name}] input validation failed: {e}")
+            return False
 
 if __name__ == "__main__":
     # Concrete implementations of BaseAgent (subclasses)
@@ -269,14 +304,4 @@ if __name__ == "__main__":
         vector_store=None,
         agent_memory=None,
         interactions="HelperBot, ResearchBot"
-    ) 
-
-    def can_handle(self, task: Dict) -> bool:
-        """
-        Simple capability check: task should include 'task_type' and match one of agent's capabilities.
-        Agents should override this for richer validation (schema checks).
-        """
-        task_type = task.get("task_type")
-        if not task_type:
-            return False
-        return task_type in getattr(self, "capabilities", [])
+    )
