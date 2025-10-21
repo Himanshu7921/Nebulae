@@ -1,0 +1,18 @@
+{
+  "capabilities": ["review_content", "fact_check", "propose_revisions"],
+  "input_schema": {
+    "type": "object",
+    "required": ["content"],
+    "properties": {
+      "content": { "type": "string" },
+      "context": { "type": "object" }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["revisions"],
+    "properties": { "revisions": { "type": "array" }, "score": { "type": "number" } }
+  },
+  "prompt_template": "Review the provided content for factual accuracy and propose revisions.",
+  "version": "0.1.0"
+}
